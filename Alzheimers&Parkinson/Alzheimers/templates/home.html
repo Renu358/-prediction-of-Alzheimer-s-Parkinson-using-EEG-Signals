@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alzheimer's and Parkinson's Disease Prediction</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  <style>
+    body {
+      background-image: url({{img}});
+      background-size: cover;
+      background-repeat: no-repeat;
+      font-family: Arial, sans-serif;
+    }
+    .container {
+      margin-top: 20px;
+      background-color: rgba(255, 255, 255, 0.8);
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .nav-link {
+      cursor: pointer;
+    }
+    .content-section {
+      display: none;
+    }
+    .card {
+      margin-bottom: 20px;
+    }
+    .progress-bar {
+      transition: width 0.6s ease;
+    }
+    .report-row {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 15px;
+    }
+    .report-card {
+      background-color: #f8f9fa;
+      border: 1px solid #dee2e6;
+      padding: 20px;
+      border-radius: 5px;
+      width: 30%;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .report-card h5 {
+      margin: 0 0 10px;
+      font-size: 1.2em;
+      color: #343a40;
+    }
+    .report-card p {
+      margin: 0;
+      font-size: 1.1em;
+      color: #6c757d;
+    }
+    .metrics-value {
+      font-weight: bold;
+      font-size: 1.2em;
+      color: #007bff;
+    }
+    .metrics-label {
+      font-size: 0.9em;
+      color: #495057;
+    }
+    .confusion-matrix {
+      margin-top: 20px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .graph {
+      margin-top: 20px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .graph-image {
+      margin-top: 20px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="text-center mb-4" style="color:rgb(127, 6, 6);font-size:28px">Alzheimer's and Parkinson's Disease Prediction</h1>
+    
+    <ul class="nav nav-tabs">
+      <li class="nav-item">
+        <a class="nav-link active" onclick="showSection('predictSection', event)">Predict</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" onclick="showSection('farVsFrrSection', event)">FAR vs FRR</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" onclick="showSection('patientsGraphSection', event)">Patients Graph</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" onclick="showSection('validationGraphSection', event)">Validation Graph</a>
+      </li>
+    </ul>
+    
+    <div id="predictSection" class="content-section">
+      <h2 class="text-center mt-4">Predict</h2>
+      <div class="row justify-content-center">
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title text-center mb-4">Upload CSV File</h5>
+              <div class="form-group">
+                <input type="file" class="form-control-file" id="fileInput">
+              </div>
+              <button type="button" class="btn btn-primary btn-block" onclick="predict()">Predict</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="predictionResult" class="mt-4" style="display: none;">
+        <div class="report-row">
+          <div class="report-card">
+            <h5>Overall Metrics</h5>
+            <p>
+              Accuracy: <span id="accuracy" class="metrics-value"></span><br>
+              Precision: <span id="precision" class="metrics-value"></span><br>
+              Recall: <span id="recall" class="metrics-value"></span><br>
+              F1-score: <span id="f1_score" class="metrics-value"></span>
+            </p>
+          </div>
+        </div>
+        <h5 class="mt-4 text-center">Confusion Matrix:</h5>
+        <div class="text-center">
+          <img id="confusionMatrix" src="" class="confusion-matrix img-fluid" width="600" height="400" alt="Confusion Matrix">
+        </div>
+      </div>
+      <div id="singlePredictionResult" class="mt-4" style="display: none;">
+        <div class="report-row">
+          <div class="report-card">
+            <h5>Predicted Class</h5>
+            <p id="predictedClass" class="metrics-value"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div id="farVsFrrSection" class="content-section">
+      <h2 class="text-center mt-4">FAR vs FRR</h2>
+      <div id="graphsContainer" class="text-center">
+        <canvas id="graph1" class="graph" width="600" height="400"></canvas>
+      </div>
+    </div>
+    
+    <div id="patientsGraphSection" class="content-section">
+      <h2 class="text-center mt-4">Patients Graph</h2>
+      <div id="graphsContainer" class="text-center">
+        <canvas id="graph2" class="graph" width="600" height="400"></canvas>
+      </div>
+    </div>
+    
+    <div id="validationGraphSection" class="content-section">
+      <h2 class="text-center mt-4">Validation Graph</h2>
+      <div id="graphsContainer" class="text-center">
+        <div id="graph3" class="graph-image">
+          <img id="graph3Image" src="" class="img-fluid" width="600" height="400" alt="Graph Image">
+        </div>
+      </div>
+    </div>
+    
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+  <script>
+    function showSection(sectionId, event) {
+      var sections = document.getElementsByClassName('content-section');
+      for (var i = 0; i < sections.length; i++) {
+        sections[i].style.display = 'none';
+      }
+      document.getElementById(sectionId).style.display = 'block';
+      var navLinks = document.getElementsByClassName('nav-link');
+      for (var i = 0; i < navLinks.length; i++) {
+        navLinks[i].classList.remove('active');
+      }
+      event.target.classList.add('active');
+    }
+
+    function predict() {
+      var fileInput = document.getElementById('fileInput');
+      var file = fileInput.files[0];
+
+      if (file) {
+        var formData = new FormData();
+        formData.append('file', file);
+
+        fetch('/predict', {
+          method: 'POST',
+          body: formData
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(result => {
+          if (result.predicted_class !== undefined) {
+            displaySinglePredictionResult(result);
+          } else {
+            displayResult(result);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+      } else {
+        alert('Please select a file.');
+      }
+    }
+
+    function displayResult(result) {
+      document.getElementById('accuracy').textContent = result.accuracy.toFixed(2);
+      document.getElementById('precision').textContent = result.precision.toFixed(2);
+      document.getElementById('recall').textContent = result.recall.toFixed(2);
+      document.getElementById('f1_score').textContent = result.f1_score.toFixed(2);
+
+      var confusionMatrix = document.getElementById('confusionMatrix');
+      confusionMatrix.src = 'data:image/png;base64,' + result.confusion_matrix;
+
+      drawGraph('graph1', result.graph1);
+      drawGraph('graph2', result.graph2);
+
+      var graph3Image = document.getElementById('graph3Image');
+      graph3Image.src = result.graph3;
+
+      document.getElementById('predictionResult').style.display = 'block';
+      document.getElementById('singlePredictionResult').style.display = 'none';
+    }
+
+    function displaySinglePredictionResult(result) {
+      document.getElementById('predictedClass').textContent = result.predicted_class;
+
+      var graph3Image = document.getElementById('graph3Image');
+      graph3Image.src = result.graph3;
+
+      document.getElementById('singlePredictionResult').style.display = 'block';
+      document.getElementById('predictionResult').style.display = 'none';
+    }
+
+    function drawGraph(canvasId, base64Image) {
+      var ctx = document.getElementById(canvasId).getContext('2d');
+      var img = new Image();
+      img.onload = function() {
+        ctx.drawImage(img, 0, 0, 600, 400);
+      };
+      img.src = 'data:image/png;base64,' + base64Image;
+    }
+
+    showSection('predictSection');
+  </script>
+</body>
+</html>
